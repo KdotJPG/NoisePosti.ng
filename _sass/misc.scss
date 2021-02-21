@@ -1,0 +1,46 @@
+#header_wrap {
+  background: #dedede;
+  background: -moz-linear-gradient(top, #000, #080);
+  background: -webkit-linear-gradient(top, #000, #080);
+  background: -ms-linear-gradient(top, #000, #080);
+  background: -o-linear-gradient(top, #000, #080);
+  background: linear-gradient(to top, #000, #080);
+  padding: 00px 00px 20px 00px;
+}
+
+#header_wrap .inner {
+  padding: 10px 10px 30px 10px;
+}
+
+.inner {
+  text-align: center;
+  position: relative;
+  width: 640px;
+  padding: 20px 10px;
+  margin: 0 auto;
+}
+
+#project_title {
+  margin: 0;
+  font-size: 80px;
+  font-weight: 700;
+  text-align: center;
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  background-image: url('../images/titlenoise.png');
+  background-size: 75%;
+  background-color: #fff;
+  text-shadow: #ccc 0px 0px 28px;
+  padding: 0px 0px 20px 0px;
+}
+
+#project_tagline {
+  color: #fff;
+  font-size: 24px;
+  font-weight: 300;
+  background: none;
+  text-shadow: #ccc 0px 0px 10px;
+  text-align: center;
+}

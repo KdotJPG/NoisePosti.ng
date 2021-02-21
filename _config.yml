@@ -1,0 +1,8 @@
+title: NoisePosti.ng
+description: A Procedural Generation and Game Development blog
+
+plugins:
+  [jekyll-paginate]
+
+paginate: 3
+paginate_path: "/page:num"

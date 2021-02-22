@@ -2,10 +2,12 @@
 layout: default
 ---
 <div class="card">
-  <div class="card-header">
-    <a href="{{ post.url }}">{{ title }}</a>
+  <div class="card-header h3">
+    {{ page.title }}
   </div>
   <div class="card-body">
+    {% if page.image %}<img src="{{ page.image }}" alt="{{ page.image_alttext }}" />{% endif %}
+    <p class="text-muted">{{ page.date | date: "%b %-d, %Y" }}</p>
     {{ content }}
   </div>
 </div>

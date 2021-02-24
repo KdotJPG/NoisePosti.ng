@@ -70,6 +70,24 @@
 
 @media screen and (max-width: 479px) {
   #project_title {
+    font-size: 50px;
+  }
+  #project_tagline {
+    font-size: 15px;
+  }
+  .inner {
+    width: 400px;
+  }
+  #header_wrap .inner {
+    padding: 7.5x 0px 20px 0px;
+  }
+  #header_wrap {
+    padding: 00px 00px 12.5px 00px;
+  }
+}
+
+@media screen and (max-width: 399px) {
+  #project_title {
     font-size: 40px;
   }
   #project_tagline {

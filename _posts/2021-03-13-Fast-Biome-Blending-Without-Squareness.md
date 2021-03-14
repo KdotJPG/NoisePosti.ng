@@ -339,8 +339,8 @@ The metrics above were all generated using 16x16 chunks. Moving up to 32x32, the
 |               | Full-Resolution   | Scattered | Convoluted Grid   | Lerped Grid   |
 | gi=8, r=24    | 5502.449          | 235.809   | 113.434           | 21.378        |
 | gi=4, r=24    | ''                | 989.238   | 392.225           | 73.194        |
-| gi=8, r=24    | 24351.690         | 768.681   | 432.915           | 34.134        |
-| gi=4, r=24    | ''                | 2900.521  | 1594.159          | 173.820       |
+| gi=8, r=48    | 24351.690         | 768.681   | 432.915           | 34.134        |
+| gi=4, r=48    | ''                | 2900.521  | 1594.159          | 173.820       |
 
 Interestingly, lerp ran a bit faster, while the other cases fared slightly worse. Chunk size might be out of your control depending on the scope of your use case, but it does appear to have an effect. How much of this can be attrbiuted to cache friendliness, point querying, memory allocation, etc. I do not know for certain.
 

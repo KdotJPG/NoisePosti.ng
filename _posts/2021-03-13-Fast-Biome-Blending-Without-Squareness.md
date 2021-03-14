@@ -44,7 +44,7 @@ A simple blending algorithm might consist of generating the biome map in full re
     <figcaption class="figure-caption">Biome blend contributions relative to a center point</figcaption>
 </figure>
 
-If the biome generation is fast, then the full-resolution blur works ok for small blending circle sizes. But as the radius increases, the loops over every coordinate start to take large amounts of time. And, if the biome generation itself isn't fast, then calculating it for every coordinate can cause performance problems too. I [implemented this a while back](https://github.com/KdotJPG/Simple-Biome-Blending), and I was not always satisfied with its speed.
+If the biome generation is fast, then the full-resolution blur works ok for small blending circle sizes. But as the radius increases, the loops over every coordinate start to take large amounts of time. And, if the biome generation itself isn't fast, then calculating it for every coordinate can cause its own performance problems. I [implemented this a while back](https://github.com/KdotJPG/Simple-Biome-Blending), and was not always satisfied with its speed.
 
 Some generators skirt around this by generating everything on a lower resolution grid, then interpolating between the gaps. This addresses the speed problem, but it prevents the borders from producing any angular variety below the scale of the grid. It pulls the borders into alignment with the grid edges, because the only data available is at the corners. It also creates regularly-spaced creases when only basic linear interpolation (lerp) is used. These issues become particularly apparent when the borders try to take on details that the grid is too coarse to capture. Minecraft is a notable example which uses this strategy, and someday I plan to write a series of articles where I suggest and implement improvements to many of the techniques Minecraft uses. For now, I will cover biome blending on its own, in a manner not specific to any game.
 
@@ -361,7 +361,7 @@ The metrics above were all generated using 16x16 chunks. Moving up to 32x32, the
 <figcaption class="figure-caption">Optimized. 32x32 chunks. Runtimes in nanoseconds per coordinate.</figcaption>
 </figure>
 
-Interestingly, lerp ran a bit faster, while the other cases fared slightly worse. Chunk size might be out of your control depending on the scope of your use case, but it does appear to have an effect. How much of this can be attrbiuted to cache friendliness, point querying, memory allocation, etc. I do not know for certain.
+Interestingly, lerp ran a bit faster, while the other cases fared slightly worse. Chunk size might be out of your control depending on the scope of your use case, but it does appear to have an effect. How much of this can be attributed to cache friendliness, point querying, memory allocation, etc. I do not know for certain.
 
 ##### Final Performance Note
 
@@ -383,13 +383,13 @@ The effect can add variety to the world generation, but if you rely on the unble
     <a href="/assets/images/fast-biome-blending-without-squareness/bordercompare_blended.png">
         <img src="/assets/images/fast-biome-blending-without-squareness/bordercompare_blended.png" style="max-height: 384px" class="figure-img img-responsive img-fluid" />
     </a>
-  <figcaption class="figure-caption">Scattered Blending</figcaption>
+  <figcaption class="figure-caption">Scattered blending</figcaption>
 </figure>
 <figure class="figure">
     <a href="/assets/images/fast-biome-blending-without-squareness/bordercompare_weightmap.png">
         <img src="/assets/images/fast-biome-blending-without-squareness/bordercompare_weightmap.png" style="max-height: 384px" class="figure-img img-responsive img-fluid" />
     </a>
-  <figcaption class="figure-caption">Re-defined Biome Map</figcaption>
+  <figcaption class="figure-caption">Re-defined biome map</figcaption>
 </figure>
 
 The title image of this article uses this re-defined biome map as well, but with different parameters that produce straighter borders.

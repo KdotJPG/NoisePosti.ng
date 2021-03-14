@@ -6,7 +6,7 @@ layout: default
     {{ page.title }}
   </div>
   <div class="card-body">
-    {% if page.image %}<img src="{{ page.image }}" alt="{{ page.image_alttext }}" />{% endif %}
+    {% if page.image %}<img src="{{ page.image }}" alt="{{ page.image_alttext }}" class="img-fluid post_title_img"  />{% endif %}
     <p class="text-muted">{{ page.date | date: "%b %-d, %Y" }}</p>
     {{ content }}
   </div>

@@ -8,7 +8,7 @@ layout: default
     <a href="{{ post.url }}" class="text-decoration-none">{{ post.title }}</a>
   </div>
   <div class="card-body">
-    {% if post.image %}<img src="{{ post.image }}" alt="{{ post.image_alttext }}" />{% endif %}
+    {% if post.image %}<a href="{{ post.url }}"><img src="{{ post.image }}" alt="{{ post.image_alttext }}" class="img-fluid post_title_img" /></a>{% endif %}
     <p class="text-muted">{{ post.date | date: "%b %-d, %Y" }}</p>
     {{ post.excerpt }}
     <a href="{{ post.url | relative_url }}" class="button">Read More</a></td>

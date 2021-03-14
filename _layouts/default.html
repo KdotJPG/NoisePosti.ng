@@ -7,6 +7,7 @@
     <title>{{ site.title }}</title>
     <meta name="viewport" content="width=device-width,maximum-scale=2">
     <link rel="stylesheet" type="text/css" media="screen" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
+    <link rel="alternate" type="application/rss+xml" href="/feed.xml" />
     <script src="{{ '/assets/js/bootstrap/bootstrap.bundle.min.js?v=' | append: site.github.build_revision | relative_url }}"></script>
     <script src="{{ '/assets/js/jquery/jquery.min.js?v=' | append: site.github.build_revision | relative_url }}"></script>
   </head>
@@ -29,7 +30,10 @@
     <!-- FOOTER  -->
     <div id="footer_wrap" class="outer">
       <footer class="inner">
-        <p class="copyright">{{ site.title }} blog by <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a></p>
+        <a href="{{ site.github.owner_url }}">Github</a>
+        &#8226;
+        <a href="/feed.xml">RSS Feed</a>
+        <p class="copyright">{{ site.title }} blog by {{ site.github.owner_name }}</p>
       </footer>
     </div>
     

@@ -1,8 +1,14 @@
 title: NoisePosti.ng
 description: A Procedural Generation and Game Development blog
+author: KdotJPG
 
 plugins:
-  [jekyll-paginate]
+  [jekyll-paginate, jekyll-feed]
 
-paginate: 3
+paginate: 6
 paginate_path: "/page:num"
+
+collections:
+  posts:
+    output: true
+    permalink: /:collection/:year-:month-:day-:title:output_ext

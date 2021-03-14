@@ -294,12 +294,19 @@ Rendering the blended colors can be useful on its own, but it doesn't show us ho
 
 As discussed at the beginning of the article, efficiency plays an important role in making this approach viable. More specifically, it should present a better tradeoff between quality and performance, compared to either the interpolated or full-resolution case. I ran some tests to measure its performance compared to the other methods, as well as how the parameters affect it. Here are the initial results, in nanoseconds per generated coordinate on my machine. Lower is faster. Note that I implemented a caching step in the scattered blending's biome map evaluation, to compensate for the full-map pre-generation advantage I gave to the other three cases.
 
+<figure markdown="1">
+
 {:.table}
 |               | Full-Resolution   | Scattered | Convoluted Grid   | Lerped Grid   |
+|-|-|-|-|-|
 | gi=8, r=24    | 6818.692          | 305.745   | 148.508           | 23.895        |
 | gi=4, r=24    | ''                | 1114.819  | 463.857           | 89.579        |
 | gi=8, r=48    | 25049.832         | 763.721   | 442.121           | 40.518        |
 | gi=4, r=48    | ''                | 2904.640  | 1624.995          | 220.749       |
+
+<figcaption class="figure-caption">Initial benchmark. 16x16 chunks. Runtimes in nanoseconds per coordinate.</figcaption>
+</figure>
+
 
 This already shows clear differences between the runtimes of each case. However, there is a straightforward optimization that lets us do better.
 
@@ -316,12 +323,18 @@ In a typical use case, many nearby points will sample the same biome. It is only
 
 Here are the updated performance metrics. In the interest of fairness, I added the optimization to all four cases.
 
+<figure markdown="1">
+
 {:.table}
 |               | Full-Resolution   | Scattered | Convoluted Grid   | Lerped Grid   |
+|-|-|-|-|-|
 | gi=8, r=24    | 4851.143          | 195.662   | 97.646            | 21.511        |
 | gi=4, r=24    | ''                | 805.298   | 329.614           | 77.301        |
 | gi=8, r=48    | 23136.046         | 664.923   | 397.046           | 40.174        |
 | gi=4, r=48    | ''                | 2662.248  | 1499.852          | 209.106       |
+
+<figcaption class="figure-caption">Optimized. 16x16 chunks. Runtimes in nanoseconds per coordinate.</figcaption>
+</figure>
 
 Applying this optimization increases performance by up to 36% for the scattered case. The full-resolution and convoluted grid cases follow closely (~29% and ~34% max), while the lerped grid shows the least improvement (~14% max).
 
@@ -335,12 +348,18 @@ The linearly interpolated case is always the fastest. However, its grid artifact
 
 The metrics above were all generated using 16x16 chunks. Moving up to 32x32, they change as follows:
 
+<figure markdown="1">
+
 {:.table}
 |               | Full-Resolution   | Scattered | Convoluted Grid   | Lerped Grid   |
+|-|-|-|-|-|
 | gi=8, r=24    | 5502.449          | 235.809   | 113.434           | 21.378        |
 | gi=4, r=24    | ''                | 989.238   | 392.225           | 73.194        |
 | gi=8, r=48    | 24351.690         | 768.681   | 432.915           | 34.134        |
 | gi=4, r=48    | ''                | 2900.521  | 1594.159          | 173.820       |
+
+<figcaption class="figure-caption">Optimized. 32x32 chunks. Runtimes in nanoseconds per coordinate.</figcaption>
+</figure>
 
 Interestingly, lerp ran a bit faster, while the other cases fared slightly worse. Chunk size might be out of your control depending on the scope of your use case, but it does appear to have an effect. How much of this can be attrbiuted to cache friendliness, point querying, memory allocation, etc. I do not know for certain.
 

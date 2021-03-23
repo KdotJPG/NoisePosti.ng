@@ -10,6 +10,8 @@
     <link rel="alternate" type="application/rss+xml" href="/feed.xml" />
     <script src="{{ '/assets/js/bootstrap/bootstrap.bundle.min.js?v=' | append: site.github.build_revision | relative_url }}"></script>
     <script src="{{ '/assets/js/jquery/jquery.min.js?v=' | append: site.github.build_revision | relative_url }}"></script>
+    {% if page.og_image %}<meta property="og:image" content="{{ page.og_image | absolute_url }}" />
+    {% elsif page.image %}<meta property="og:image" content="{{ page.image | absolute_url }}" />{% endif %}
   </head>
 
   <body>

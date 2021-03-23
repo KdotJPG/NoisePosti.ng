@@ -2,6 +2,7 @@
 layout: post
 title: Normalizing Gradient Noise
 image: /assets/images/normalizing-gradient-noise/title.png
+og_image: /assets/images/normalizing-gradient-noise/og_image.png
 ---
 One of the trickiest steps that can be involved in implementing noise algorithms, is to make their output fit tightly into certain bounds. Generally, this is accomplished by determining the min and max of the unmodified noise as accurately as possible, then rescaling the output to [-1, 1]. There is not always a nice formula to compute these values, and brute-force approaches can be unreliable. In this article, I will describe the tools I created to find these values in common gradient-based noises, and the techniques they employ.
 

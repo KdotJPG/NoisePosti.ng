@@ -73,7 +73,7 @@ An idealized solution might consist of expressing the exact result in terms of f
 
 ##### High-Degree Polynomials
 
-Common gradient noises all involve, in some form, piecewise polynomial functions that define contribution falloff weights for each grid vertex in range. Each weight is multiplied by a gradient ramp emanating from the vertex, and the results are combined to form a final noise value. This might sound complex, but it's really just the combination of a few simple math functions. The graphs below should illustrate what happens. Note that the `max(...)` component, which prevents the function from dropping below zero, is what characterizes the falloff function as piecewise.
+Common gradient noises all involve, in some form, piecewise polynomial functions that define contribution falloff weights for each grid vertex in range. Each weight is multiplied by a gradient ramp emanating from the vertex, and the results are combined to form a final noise value. This might sound complex, but it's really just the combination of a few simple math functions. The graphs below illustrate what happens. Note that the `max(...)` component, which prevents the function from dropping below zero, is what characterizes the falloff function as piecewise.
 
 <div>
     <figure class="figure">

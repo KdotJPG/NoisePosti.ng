@@ -1,0 +1,8 @@
+<figure class="figure">
+    {% if include.nolink == null %}<a href="{{ include.url }}">{% endif %}
+        <img src="{{ include.url }}"
+             style="max-height: {{ include.max_height }}px;"
+             class="figure-img img-responsive img-fluid" />
+    {% if include.nolink == null %}</a>{% endif %}
+    {% if include.caption %}<figcaption class="figure-caption">{{ include.caption }}</figcaption>{% endif %}
+</figure>

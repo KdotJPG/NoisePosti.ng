@@ -80,7 +80,7 @@ If you're familiar with any of the noises above, you may have also heard of **Si
 {% include figure.html url="/assets/images/the-perlin-problem-moving-past-square-noise/simplex_noise_2D_fBm.png" max_height="384" caption="2D Simplex noise with fractal summation." %}
 {% include figure.html url="/assets/images/the-perlin-problem-moving-past-square-noise/coastlines_simplex.png" max_height="384" caption="FBm Simplex noise terrain." %}
 
-#### (Expired) Patent, Related Noises
+#### (Expired?) Patent, Related Noises
 
 Those of you familiar with Simplex may also know of its US patent (US6867776B2), which covered certain implementations and use cases of the noise in 3D+. While thankfully somewhat more refined in scope than other patents, it surely played a role in curbing the noise's popularity. In efforts to alleviate some of these concerns, three contributions I made to the field are **OpenSimplex** (2014), then **OpenSimplex2** (2019) and **OpenSimplex2S** (2017/2019). These noises have gained some traction in applications that would otherwise use Simplex. All four of these *Simplex-type* noises share key details, both inside and out, that relate them to one another.
 

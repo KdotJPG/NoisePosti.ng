@@ -3,13 +3,13 @@ layout: post
 title: Fast Biome Blending, Without Squareness
 image: /assets/images/fast-biome-blending-without-squareness/title.png
 ---
-Many games that feature procedurally generated worlds, divide the worlds into individual biomes. The biomes often have separate terrain or features, which need to be blended smoothly at the borders. Most of the common or intuitive solutions suffer one of two shortcomings: they're slow, or they have visible grid patterns. In this post, I will demonstrate a method which avoids the latter with a much better tradeoff in the former. The method involves two main components: Voronoi-noise-style data point distribution, and normalized sparse convolution.
+Many games that feature procedurally generated worlds divide the worlds into individual biomes. The biomes often have separate terrain or features, which need to be blended smoothly at the borders. Most of the common or intuitive solutions suffer one of two shortcomings: they're slow, or they have visible grid patterns. In this post, I will demonstrate a method which avoids the latter with a much better tradeoff in the former. The method involves two main components: Voronoi-noise-style data point distribution, and normalized sparse convolution.
 
 ### Defining the Output
 
 To implement effective biome blending, there is certain data I want to produce at each point in the world. To make the blending portable to a wide variety of scenarios, the idea is to produce weight values that correspond to the contribution each biome makes at a particular coordinate. For example, the blender might output weights `{Forest: 0.6, Plains: 0.4}` somewhere inside the transition zone between the two biomes. If our goal is to compute terrain height, then we can add together the weighted biome heights as follows: `Forest.GetHeight(...) * 0.6 + Plains.GetHeight(...) * 0.4`. It would also be possible for three (or more) biomes to merge near a corner: `{Forest: 0.55, Plains: 0.24, Mountains: 0.21}`, or to be entirely inside one biome: `{Plains: 1.0}`.
 
-Importantly, these weights should change gradually throughout the world, so that they do not introduce any jumps (or creases either ideally) into the world generation. This way, every border is a smooth ramp between the values each biome would produce on their own. The weights should also always add up to one at a given coordinate. For a location entirely inside one biome, a weight of one means the biome can decide the terrain features without any unintended rescaling. Where biomes mix, this makes sure the ramp doesn't form a bump or a dip if the blended values are extreme.
+Importantly, these weights should change gradually throughout the world, so that they do not introduce any jumps (or creases either ideally) into the world generation. This way every border is a smooth ramp between the values each biome would produce on their own. The weights should also always add up to one at a given coordinate. For a location entirely inside one biome, a weight of one means the biome can decide the terrain features without any unintended rescaling. Where biomes mix, this makes sure the ramp doesn't form a bump or a dip if the blended values are extreme.
 
 <figure class="figure">
     <a href="/assets/images/fast-biome-blending-without-squareness/biome_ramp.png">
@@ -31,11 +31,11 @@ Importantly, these weights should change gradually throughout the world, so that
 </figure>
 
 
-There are many ways to format the data, all of which provide the same information. I will cover the format I used later in the article.
+There are many ways to arrange the data, all of which provide the same information. I will cover the format I used later in the article.
 
 ### Methods and Problems
 
-A simple blending algorithm might consist of generating the biome map in full resolution, and performing a Gaussian-like blur on it to produce the blending weights. To do this, you might start by populating the map in a large enough area around the part of the world to be generated. If your world is generated in sections or "chunks", then you might employ caching here to prevent repeatedly generating the same areas. After this, consider a circle around each column or pixel coordinate to generate the terrain for. On the biome map, set up like you're going to count the number of cells of each biome that show up inside the circle. But instead of adding one each time, add a number that decreases with distance. I might use the formula `max(0, radius^2 - dx^2 - dy^2)^2` for this. It produces a circular bump like a [Gaussian filter](https://en.wikipedia.org/wiki/Gaussian_filter ), but it goes zero smoothly at a finite radius. To make the biome weights add up to one, each needs to be multiplied by the reciprocal of the total. Because the total is constant, the reciprocal can be precomputed.
+A simple blending algorithm might consist of generating the biome map in full resolution, then performing a Gaussian-like blur on it to produce the blending weights. To do this, you might start by populating the map in a large enough area around the part of the world to be generated. If your world is generated in sections or "chunks", then you might employ caching here to prevent repeatedly generating the same areas. After this, consider a circle around each column or pixel coordinate to generate the terrain for. On the biome map, set up like you're going to count the number of cells of each biome that show up inside the circle. But instead of adding one each time, add a number that decreases with distance. I might use the formula `max(0, radius^2 - dx^2 - dy^2)^2` for this. It produces a circular bump like a [Gaussian filter](https://en.wikipedia.org/wiki/Gaussian_filter ), but it goes zero smoothly at a finite radius. To make the biome weights add up to one, each needs to be multiplied by the reciprocal of the total. Because the total is constant, the reciprocal can be precomputed.
 
 Update 03/31/2021: A handful of readers were astute to point out that a Gaussian filter is [separable](https://en.wikipedia.org/wiki/Separable_filter). This means the blurring operation can be performed using two fast steps along each axis, instead of one slow step over the full range. I have removed the wording that described the polynomial as faster. While this is true when comparing individual formula point evaluations, it can cause confusion due to the different opportunities for optimization that each option presents in this case. It also becomes inconsequential if the filter is pre-computed and stored in an array.
 
@@ -71,7 +71,7 @@ In my solution, I replace the grid with randomly distributed data points. Then, 
 
 ##### Distributing Points
 
-To produce the point distribution, I used a jittered triangular/hexagonal grid. Each vertex on the grid is displaced in a randomized direction by a fixed distance, similar to how [Voronoi noise](https://www.redblobgames.com/x/2022-voronoi-maps-tutorial/#org26d7226) is often implemented. This creates a distribution that appears random, but doesn't have any large gaps. A jittered square grid can also work, as is shown on the linked page at RedBlobGames. However, the triangular option confers less possibility for visible axis alignment. For this reason, I consider the triangular basis to be a better choice for most terrain generation applications. If your world is finite and small, Poisson disc sampling would probably be even better. I might explore this more in a future article. [This RedBlobGames page](https://www.redblobgames.com/x/1830-jittered-grid/) demonstrates and compares all three of these distributions.
+To produce the point distribution, I used a jittered triangular/hexagonal grid. Each vertex on the grid is displaced in a randomized direction by a fixed distance, similar to how [Voronoi noise](https://www.redblobgames.com/x/2022-voronoi-maps-tutorial/#org26d7226) is often implemented. This creates a distribution that appears random, but doesn't have any large gaps. A jittered square grid can also work, as is shown on the linked page at RedBlobGames. However, the triangular option confers less possibility for visible axis alignment. For this reason, I consider the triangular basis to be a better choice for most terrain generation applications. Blue Noise point distributions would be even better -- in particular you can use Poisson disc sampling if your world is finite and small. I might explore this more in a future article. [This RedBlobGames page](https://www.redblobgames.com/x/1830-jittered-grid/) demonstrates and compares all three of these distribution types.
 
 <figure class="figure">
     <a href="/assets/images/fast-biome-blending-without-squareness/jitter_base_grid.png">
@@ -267,7 +267,7 @@ To see if I could get better results from the grid cases, I doubled the grid fre
 
 The interpolation intervals on the denser lerped grid are less visible from an aerial view like this. However, they are still the most visible of the axis-biased artifacts, consisting of regularly-spaced creases in the terrain. Particularly, they remain quite apparent at the local scale of the world that a first-person player would experience. If the linear interpolation itself were performed on a jittered triangular mesh, then I would find the creases less problematic. It is the grid nature of the creases that leads me to reject this approach.
 
-In the denser convoluted grid, there are no creases, and there is much better preservation of directions. However, there is still some of a square grid effect, whereas the purpose of this article is to avoid it entirely. Many of the borders that are already running roughly 45 or 90 degrees, seem to lie parallel enough to the grid's sampling points that it pulls them completely into following those angles. Some of the transitions also repeat shapes based on the grid, which can become apparent when blending between large height differences. Regardless, it is vitally dependent on its parameters to produce decent results, which can lead to problems in user-customizable worlds. With these parameters, though, it's not too bad. And a bit of jitter might solve the remaining issues.
+In the denser convoluted grid, there are no creases, and there is much better preservation of directions. However, there is still some of a square grid effect, whereas the purpose of this article is to avoid it entirely. Many of the borders that are already running roughly 45 or 90 degrees, seem to lie parallel enough to the grid's sampling points that it pulls them completely into following those angles. Some of the transitions also repeat shapes based on the grid, which can become apparent when blending between large height differences. Regardless, it is vitally dependent on its parameters to produce decent results, which can lead to problems in user-customizable worlds. With these parameters, though, it's better than it was previously, and a bit of jitter might solve the remaining issues.
 
 ##### Heightmap Example
 
@@ -294,7 +294,7 @@ Rendering the blended colors can be useful on its own, but it doesn't show us ho
 
 ### Performance
 
-As discussed at the beginning of the article, efficiency plays an important role in making this approach viable. More specifically, it should present a better tradeoff between quality and performance, compared to either the interpolated or full-resolution case. I ran some tests to measure its performance compared to the other methods, as well as how the parameters affect it. Here are the initial results, in nanoseconds per generated coordinate on my machine. Lower is faster. Note that I implemented a caching step in the scattered blending's biome map evaluation, to compensate for the full-map pre-generation advantage I gave to the other three cases.
+As discussed at the beginning of the article, efficiency plays an important role in making this approach viable. More specifically, it should present a better tradeoff between quality and performance compared to either the interpolated or full-resolution case. I ran some tests to measure its performance compared to the other methods, as well as how the parameters affect it. Here are the initial results, in nanoseconds per generated coordinate on my machine. Lower is faster. Note that I implemented a caching step in the scattered blending's biome map evaluation to compensate for the full-map pre-generation advantage I gave to the other three cases.
 
 <figure markdown="1">
 
@@ -344,7 +344,7 @@ For given parameter values, the scattered blend is not as fast as the convoluted
 
 The convoluted grid case is faster than scattered, however its grid artifacts only start to become convincingly hidden for grid intervals &#8804;4. At that point, you lose enough of its performance advantage that it would be easy to instead pick a lower sampling frequency for the scattered case, such that it is faster at the same time as lacking visible grid artifacts.
 
-The linearly interpolated case is always the fastest. However, its grid artifacts are so visible, that the speed isn't worth it in my opinion. You can try a grid interval of 2, which <a href="/assets/images/fast-biome-blending-without-squareness/comparison_lerpgrid_r24_gi2_worldpainter.png">looks a lot better than 4</a>, but this increases the above runtimes to **594.905** (r=24) and **2025.882** (r=48). These times are easy to beat with scattered blending.
+The linearly interpolated case is always the fastest, however its grid artifacts are so visible that the speed isn't worth it in my view. You can try a grid interval of 2, which <a href="/assets/images/fast-biome-blending-without-squareness/comparison_lerpgrid_r24_gi2_worldpainter.png">looks a lot better than 4</a>, but this increases the above runtimes to **594.905** (r=24) and **2025.882** (r=48). These times are easy to beat with scattered blending.
 
 ##### Chunk Size
 
@@ -367,7 +367,7 @@ Interestingly, lerp ran a bit faster, while the other cases fared slightly worse
 
 ##### Final Performance Note
 
-As this generation only occurs in 2D, and you may have many other steps in your terrain's generation (e.g. 3D noise, feature placement), it might be worth considering this in context of your generator's performance as a whole. Unless you can improve many of its parts in a similar way, then focusing on percentage improvements in individual parts can lead to a skewed picture of the total percentage speedup you would gain. The scattered blending isn't as fast as lerp, but it's much faster than the full-resolution case. It's also more inline with the runtime of typical heightmap formulas that consist of multiple noise evaluations ~20-100ns each (on my machine), and already faster than you can likely expect from optimized (full-resolution) 3D noisemaps.
+As this generation only occurs in 2D, and you may have many other steps in your terrain's generation (e.g. 3D noise, feature placement), it might be worth considering this in context of your generator's performance as a whole. Unless you can improve many of its parts in a similar way, focusing on percentage improvements in individual parts can lead to a skewed picture of the total percentage speedup you would gain. The scattered blending isn't as fast as lerp, but it's much faster than the full-resolution case. It's also more in line with the runtime of typical heightmap formulas that consist of multiple noise evaluations ~20-100ns each (on my machine), and already faster than you can likely expect from optimized (full-resolution) 3D noisemaps.
 
 ### Noisy Borders (for better or worse)
 
@@ -394,7 +394,7 @@ The effect can add variety to the world generation, but if you rely on the unble
   <figcaption class="figure-caption">Re-defined biome map</figcaption>
 </figure>
 
-The title image of this article uses this re-defined biome map as well, but with different parameters that produce straighter borders.
+The title image of this article uses this redefined biome map as well, but with different parameters that produce straighter borders.
 
 ### Generality Note
 
@@ -408,7 +408,7 @@ The point querying technique is being used here with the specific purpose of sam
 
 ### Further Considerations
 
-I covered many points that may come up during use of this blending. However, in the interest of keeping a semblance of brevity, there is a lot that I didn't cover or elaborate on. I may explore some of these in the future.
+I covered many points that may come up during use of this blending. However in the interest of keeping a semblance of brevity, there is a lot that I didn't cover or elaborate on. I may explore some of these in the future.
 
 - Configurable biome map generation
 - Adjusting the result to respect biome altitude boundaries (e.g. land/sea at sealevel)

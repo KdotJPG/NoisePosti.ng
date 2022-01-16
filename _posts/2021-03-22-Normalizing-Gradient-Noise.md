@@ -4,7 +4,7 @@ title: Normalizing Gradient Noise
 image: /assets/images/normalizing-gradient-noise/title.png
 og_image: /assets/images/normalizing-gradient-noise/og_image.png
 ---
-One of the trickiest steps that can be involved in implementing noise algorithms, is to make their output fit tightly into certain bounds. Generally, this is accomplished by determining the min and max of the unmodified noise as accurately as possible, then rescaling the output to [-1, 1]. There is not always a nice formula to compute these values, and brute-force approaches can be unreliable. In this article, I will describe the tools I created to find these values in common gradient-based noises, and the techniques they employ.
+One of the trickiest steps that can be involved in implementing noise algorithms is to make their output fit tightly into certain bounds. Generally, this is accomplished by determining the min and max of the unmodified noise as accurately as possible, then rescaling the output to [-1, 1]. There is not always a nice formula to compute these values, and brute-force approaches can be unreliable. In this article, I will describe the tools I created to find these values in common gradient-based noises, and the techniques they employ.
 
 ### Purpose
 
@@ -156,7 +156,7 @@ Setting the gradients this way eliminates the problem of searching for good conf
 
 ##### Termination
 
-There needs to be a way to stop the ascent once the evaluation point is not able to move any higher. I chose the following solution, which seemed to work well: (1) check if adding the movement vector changed the location of the evaluation point, (2) if not, double the movement and re-try for a few iterations, and (3) stop if it remained stationary. The goal of this is both to avoid irrecoverably overshooting the max, and to reach the top of the hill as accurately as possible within the limits of floating point precision.
+There needs to be a way to stop the ascent once the evaluation point is not able to move any higher. I chose the following solution, which seemed to work well: (1) check if adding the movement vector changed the location of the evaluation point, (2) if not, double the movement and re-try for a few iterations, and (3) stop if it remained stationary. The goal of this is both to avoid irrecoverably overshooting the max and to reach the top of the hill as accurately as possible within the limits of floating point precision.
 
 ### Starting with Simplex
 
@@ -279,9 +279,9 @@ In some cases, a bound of [0, 1] is desired instead. In this case, the resulting
 
 ##### Precision Notes
 
-Due to slight precision differences between the normalizer and actual noise implementations, there is still a chance for the result to be slightly off. One hopeful fact, is that there is a small amount of leeway regarding a number's reciprocal. For example, computing `1.0 / 0.0796983766893533` returns `12.547307003476112`. But `0.0796983766893533 * 12.547307003476112` actually returns `0.9999999999999999`. Interestingly, up to `12.547307003476114` can be used without the result exceeding `1.0` in double precision. I don't know if this is enough margin to prevent noise values such as `1.0000000000000002` from ever occurring, so someday I might find the time to recreate the maximizing scenarios within the actual noise algorithms. For now, this is the most accurate existing solution to this problem that I am aware of.
+Due to slight precision differences between the normalizer and actual noise implementations, there is still a chance for the result to be slightly off. One hopeful fact is that there is a small amount of leeway regarding a number's reciprocal. For example, computing `1.0 / 0.0796983766893533` returns `12.547307003476112`. But `0.0796983766893533 * 12.547307003476112` actually returns `0.9999999999999999`. Interestingly, up to `12.547307003476114` can be used without the result exceeding `1.0` in double precision. I don't know if this is enough margin to prevent noise values such as `1.0000000000000002` from ever occurring, so someday I might find the time to recreate the maximizing scenarios within the actual noise algorithms. For now, though, this is the most accurate existing solution to this problem that I am aware of.
 
-There is also slightly more opportunity for error when the normalization is applied to the gradient tables, rather than to the result directly. To account for this, I added an optional step which bakes a user-specified normalization constant into the gradient tables, before searching for the bounds. This way, a user can at least check if their constant passes this test.
+There is also slightly more opportunity for error when the normalization is applied to the gradient tables, rather than to the result directly. To account for this, I added an optional step which bakes a user-specified normalization constant into the gradient tables before searching for the bounds. This way a user can at least check if their constant passes this test.
 
 ### Another Article
 

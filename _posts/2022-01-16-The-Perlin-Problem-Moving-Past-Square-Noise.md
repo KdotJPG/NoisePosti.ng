@@ -7,7 +7,7 @@ date: 2022-01-16 0
 
 Noise plays an elemental role in many genres of procedural generation. One algorithm in particular, Perlin noise, has dominated the conversational spotlight, but it suffers a critical flaw: visible axis alignment. Newer approaches exist which address this problem, but such biased noise still sees widespread use where it may not be the right choice. In this article, I will dive deep into this issue and cover two of our most practical options now.
 
-*This article is the first segment of a two-part separation of the original. The second can be found [here](2022-01-16-The-Perlin-Problem-Breaking-The-Cycle.html).*
+*This article comprises the first segment of a two-part separation of the original. The second can be found [here](2022-01-16-The-Perlin-Problem-Breaking-The-Cycle.html).*
 
 ---
 

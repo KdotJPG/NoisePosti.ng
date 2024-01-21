@@ -15,7 +15,7 @@
 
 - [BIT-101: Perlin vs Simplex](https://www.bit-101.com/blog/2021/07/perlin-vs-simplex/)
 - [Red Blob Games: Making Maps with Noise Functions](https://www.redblobgames.com/maps/terrain-from-noise/) - Comprehensive, recurrently-updated noise fundamentals article presenting primarily-modern\* information.
-- [Stefan Gustavson: Simplex Noise Demystified](https://weber.itn.liu.se/~stegu/simplexnoise/simplexnoise.pdf)
+- [Stefan Gustavson: Simplex Noise Demystified](https://web.archive.org/web/20230310204121id_/https://weber.itn.liu.se/~stegu/simplexnoise/simplexnoise.pdf)
 - [Ken Perlin: Noise Hardware](https://www.csee.umbc.edu/~olano/s2002c36/ch02.pdf) - Original Simplex noise paper.
 
 <div markdown="1" style="font-size: 0.85em">

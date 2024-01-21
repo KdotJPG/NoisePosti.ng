@@ -118,3 +118,7 @@
     text-align: center;
     width: 100%;
 }
+
+.accordion-body {
+    background-color: tint-color($card-bg, 3%)
+}

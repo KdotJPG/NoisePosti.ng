@@ -4,7 +4,7 @@ title: "Evaluating Multiple Noise Seeds at Once"
 image: /assets/images/multi-seedable-noise/title.png
 ---
 
-Applications leveraging procedural noise often rely on a network of interconnected noise channels. In certain situations, some of these layers may share a common frequency and differ only in their seeds. This is notably prevalent in cave tunnel generation, biome map sampling, and multi-color blending, where the target patterns can depend fundamentally on the interplay between multiple individual values. As the complexity of a generator grows, so too can the importance of optimization. In this article, I will demonstrate an approach through which multiple seeds of noise can be evaluated using a single efficient function call.
+Applications built on procedural noise often rely on a network of interconnected noise channels. In certain situations, some of these layers may share a common frequency and differ only in their seeds. This is notably prevalent in cave tunnel generation, biome map sampling, and multi-color blending, where the target patterns can depend fundamentally on the interplay between multiple individual values. As the complexity of a generator grows, so too can the importance of optimization. In this article, I will demonstrate an approach through which multiple seeds of noise can be evaluated using a single efficient function call.
 
 ----
 

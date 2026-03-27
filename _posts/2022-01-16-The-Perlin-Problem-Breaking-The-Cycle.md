@@ -5,7 +5,7 @@ image: /assets/images/the-perlin-problem-moving-past-square-noise/cycle.png
 date: 2022-01-16 1
 ---
 
-In [The Perlin Problem: Moving Past Square Noise](/posts/2022-01-16-The-Perlin-Problem-Moving-Past-Square-Noise.html), I shed light on the axis alignment problems Perlin and related noises carry in their unmitigated forms. I then covered two key tools we have to address them: Simplex-type noise and Domain Rotation. Here, I will recommend a set of best practices we can employ to improve the information we contribute to the field, keeping our content as helpful as possible.
+In [The Perlin Problem: Moving Past Square Noise](/posts/2022-01-16-The-Perlin-Problem-Moving-Past-Square-Noise.html), I shed light on the axis alignment problems Perlin and related noises carry in their unmitigated forms. I then covered two key tools we have to address them: Simplex-type noise and Domain Rotation. Here, I will recommend a set of best practices we can employ to keep the content we contribute to the field as helpful as possible.
 
 ### Overview
 

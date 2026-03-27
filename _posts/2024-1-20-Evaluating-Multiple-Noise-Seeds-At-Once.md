@@ -4,7 +4,7 @@ title: "Evaluating Multiple Noise Seeds at Once"
 image: /assets/images/multi-seedable-noise/title.png
 ---
 
-Applications built on procedural noise often rely on a network of interconnected noise channels. In certain situations, some of these layers may share a common frequency and differ only in their seeds. This is notably prevalent in cave tunnel generation, biome map sampling, and multi-color blending, where the target patterns can depend fundamentally on the interplay between multiple individual values. As the complexity of a generator grows, so too can the importance of optimization. In this article, I will demonstrate an approach through which multiple seeds of noise can be evaluated using a single efficient function call.
+Procedural generation pipelines often rely on networks of interconnected noise channels. In some situations, several layers may share a frequency and differ only in their seeds. This is common in cave tunnel generation, biome map sampling, and color blending, where the target patterns depend fundamentally on the interplay between multiple individual values. As the complexity of a generator grows, so too can the importance of optimization. In this article, I will demonstrate an approach through which multiple seeds of noise can be evaluated using a single efficient function call.
 
 ----
 
@@ -12,7 +12,7 @@ Applications built on procedural noise often rely on a network of interconnected
 
 The execution of most coordinate-evaluated noise algorithms can be divided into three interwoven steps: *vertex discovery*, *vertex computations*, and *result combination*. The function accepts an input coordinate to identify which vertices are in range. The coordinates of the vertices are then hashed based on the seed to derive specific data such as gradient directions, scalar values, or displacements. Finally, the results are combined, accounting for the positions of each vertex relative to the evaluation point.
 
-While the majority of the generated vertex data relies on the seed of the noise layer, certain procedures are influenced solely by the input coordinate, and remain consistent across all layers of a given frequency. This typically includes the entire discovery phase and part of the vertex computation stage. We can leverage this to evaluate multiple seeds at once, duplicating only the seed-dependent operations.
+While the majority of the generated vertex data relies on the seed of the noise layer, certain procedures are influenced solely by the input coordinate, and remain consistent across all layers of a given frequency. Usually, this includes the entire discovery phase and part of the vertex computation stage. We can leverage this to evaluate multiple seeds at once, duplicating only the seed-dependent operations.
 
 Each noise type examined will include code snippets that demonstrate the refactoring. The full implementations can be found [on GitHub](https://github.com/KdotJPG/Noise-Extras/tree/master/Multi-Seedable Noise).
 
@@ -254,7 +254,7 @@ private static void Contribution(
 {% include figure.html url="/assets/images/multi-seedable-noise/rotated-perlin-plain.png" max_height="384" caption="" caption="Plain 2D slice of 3D Perlin (without/with domain rotation)" %}
 {% include figure.html url="/assets/images/multi-seedable-noise/rotated-perlin-fbm-max-regions.png" max_height="384" caption="" caption="Perlin (domain-rotated 3D slices, fBm, max) forming color-coded regions. Winner chooses color." %}
 
-Perlin noise follows a simpler process to Simplex, and it shares similar seed dependency patterns. While it omits the skew transform (we will still include a [domain rotation](2022-01-16-The-Perlin-Problem-Moving-Past-Square-Noise.html#domain-rotation) for appearance) and ordered edge traversal steps, it retains the floor/modulo operation and seed-independence of its vertex weight computations. Accordingly, the Perlin algorithm can be adapted to support multiple seeds in much the same way as Simplex.
+Perlin noise follows a simpler process to Simplex, and it shares similar seed dependency patterns. While it omits the skew transform (we will still include a [domain rotation](2022-01-16-The-Perlin-Problem-Moving-Past-Square-Noise.html#domain-rotation) for appearance) and ordered edge traversal steps, it retains the floor/modulo operation and seed-independence of its vertex weight computations. Accordingly, the Perlin algorithm can be adapted to support multiple seeds in much the same way.
 
 The following code samples demonstrate the implementation of this change. Note the refactoring of the axis interpolations in the multi-seeded variant into individual falloff weight multipliers. This removes the need for intermediate buffers.
 
@@ -395,9 +395,9 @@ private static void Gradient(
 
 {% include figure.html url="/assets/images/multi-seedable-noise/cellular-tubular-mesh-raycast.png" max_height="384" caption="" caption="Smooth intersection between two channels of `F1²/F2²` cellular noise." %}
 
-Cellular noise, also labeled *Worley* or *Voronoi* noise, has a distinct evaluation procedure. Instead of mixing gradient ramps, it generates its geometric appearance by tracking the distances of pseudorandomly-distributed points -- typically displaced grid vertices. The smallest values corresponding to the closest points' distances are then passed through any final calculations, and a result is returned. In spite of its differences, however, its core implementation pattern still aligns with the three-step mold.
+Cellular noise, also known as *Worley* or *Voronoi* noise, has a distinct evaluation procedure. Instead of mixing gradient ramps, it generates its geometric appearance by tracking the distances of pseudorandomly-distributed points -- typically displaced grid vertices. The smallest values corresponding to the closest points' distances are then passed through any final calculations, and a result is returned. In spite of its differences, however, its core implementation pattern still aligns with the three-step mold.
 
-Among the various conceptualizations of cellular noise, we will focus on a specific variant: one involving a cube grid for simplicity, a full displacement range for quality, skip conditions for efficiency, and a group-sorted iteration order to faciliate the skip conditions. In this implementation, there is no grid skew step -- only an optional rotation, and one point is chosen within each cube as an *offset* from its originating vertex. Evaluation entails checking every base cell that could contain a point that would impact the final result, until it is certain that the closest point is found. We will also use a simple `F1²` return result, which corresponds to the unprocessed squared Euclidean distance to the closest point.
+Among the various conceptualizations of cellular noise, we will focus on a specific variant: one involving a cube grid for simplicity, a full displacement range for quality, skip conditions for efficiency, and a group-sorted iteration order to faciliate the skip conditions. In this implementation, there is no grid skew step -- only an optional rotation, and one point is chosen within each cube as an *offset* from its originating vertex. Evaluation entails checking every base cell that could contain a relevant point until it is certain that the closest is found. We will also use a simple `F1²` return result, which corresponds to the unprocessed squared Euclidean distance to the closest point.
 
 Note the behavior of the skip conditions in the following implementations. In the multi-seeded embodiment, it must consider an aggregate bound across the entire channel set.
 
@@ -423,7 +423,7 @@ public static double Noise3_ImproveXZ(long seed, double x, double y, double z) {
 	z += xzOffset;
 	y = yRescaled - xPlusZ * Root3Over3;
 
-	int xBase = ExtraMath.FastFloor(x), yBase = ExtraMath.FastFloor(y), zBase = ExtraMath.FastFloor(z);
+	int xBase = FastFloor(x), yBase = FastFloor(y), zBase = FastFloor(z);
 	double xDelta = x - xBase, yDelta = y - yBase, zDelta = z - zBase;
 	long xBasePrimed = xBase * PRIME_X, yBasePrimed = yBase * PRIME_Y, zBasePrimed = zBase * PRIME_Z;
 
@@ -586,9 +586,9 @@ The next three capture the amortized runtime per individual value produced.
 
 Several notable observations can be drawn from this data.
 
-First, the multi-seeded noise implementations display measurable improvements in efficiency as the number of seeds increases. Among the evaluated noise types, Simplex showcases the most gradual growth in runtime, followed by Cellular, with Perlin falling in last. This discrepancy in the technique's efficacy appears correlated with the intensity of the seed-independent operations in each noise type. Simplex involves grid transformations and falloff functions, this particular Cellular implementation performs some pre-processing for its skip conditions, all while Perlin requires only a few smoothstep evaluations. As a result, it is difficult to optimize Perlin to the same degree with this technique.
+First, the multi-seeded noise implementations display measurable improvements in efficiency as the number of seeds increases. Among the evaluated noise types, Simplex showcases the most gradual growth in runtime, followed by Cellular, with Perlin falling in last. This discrepancy in the technique's efficacy appears correlated with the intensity of the seed-independent operations in each noise type. Simplex involves grid transformations and falloff functions, this particular Cellular implementation performs some pre-processing for its skip conditions, all while Perlin requires only a few smoothstep evaluations. As a result, it is difficult to optimize Perlin to the same degree.
 
-Secondly, Cellular's amortized runtime curves convey non-monotonic trends, which might relate to the skip conditions in this implementation. The early stopping conditions significantly improve the algorithm's initial performance, as it would otherwise process all 81 possible points every evaluation, but can become less likely to take effect as more seeds' distances are processed in parallel. The increasing trend for the individual evaluator may relate to discrepancies at the hardware branch prediction level. It's worth noting that the 3D cellular functions in many popular libraries only check 27 distances, but lack the early return functionality present in the example here.
+Secondly, Cellular's amortized runtime curves convey non-monotonic trends, likely related to the skip conditions in this implementation. These early exits significantly improve the algorithm's initial performance, as it would otherwise process all 81 possible points every evaluation, but become less likely to activate as more seeds' distances are processed in parallel. The increasing trend for the individual evaluator may arise in part from discrepancies at the hardware branch prediction level. It's worth noting that the 3D cellular functions in many popular libraries only check 27 distances, but lack the early return functionality present in the example here.
 
 Furthermore, for a single seed, the standard evaluators remain marginally more efficient. This is to be expected, as the loops and dereferencing in the multi-seedable implementations introduce some overhead into the procedures. Once two or more seeds are in play, all three multi-seedable implementations take the lead.
 
@@ -632,4 +632,4 @@ Finally, the absolute efficiencies of the multi-seed variants follow the same or
 
 ### Conclusion
 
-Combining identically-configured noise channels into a single function call can considerably improve the performance characteristics of a generator. By repeating only the seed-dependent steps, this optimization yields measurable speed increases -- nearly doubling the efficiency of Simplex for only four layers. While the situations where this technique applies can be specific, and certain tradeoffs may need to be considered, it provides promising potential to accelerate a host of common scenarios.
+Combining identically-configured noise channels can considerably improve performance. By repeating only the seed-dependent steps, significant speed increases can be achieved -- nearly double for Simplex with only four layers. While this technique might not always apply, its benefits are clear where it does.
